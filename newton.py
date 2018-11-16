@@ -73,4 +73,4 @@ class Newton(object):
         if np.isscalar(x):
             h = np.asscalar(h)
 
-        return x + h
+        return x - h #this needs to be a subtraction, not addition to satisfy the Newton method

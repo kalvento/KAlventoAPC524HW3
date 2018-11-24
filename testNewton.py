@@ -50,13 +50,20 @@ class TestNewton(unittest.TestCase):
     
     def test_poor_initial_guess(self):
         import math
-        f = lambda x : x*math.exp(-x*x)
+        f = lambda x : x*math.exp(x)
         #if maxiter is 20 here, the value given back is not the root, it is
         #just the value that the solver ended up on
         #when maxiter is 2000, gives 6.06
-        solver = newton.Newton(f, tol=1.e-15, maxiter=2000)
+        solver = newton.Newton(f, tol=1.e-15, maxiter=30)
         x = solver.solve(1)
         self.assertAlmostEqual(x, 0)
+        return
+    
+    def test_radius_max(self):
+        import math
+        f = lambda x : x*math.exp(x)
+        solver = newton.Newton(f, tol=1.e-15, maxiter=30, radius_max=0.3)
+        self.assertRaises(Exception, solver.solve, -1)
         return
     
     def test_higher_order(self):

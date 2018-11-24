@@ -13,7 +13,7 @@ class Newton(object):
 
     """
     
-    def __init__(self, f, tol=1.e-6, maxiter=20, dx=1.e-6):
+    def __init__(self, f, tol=1.e-6, maxiter=20, dx=1.e-6, radius_max=None):
         """Parameters:
         
         f: the function whose roots we seek. Can be scalar- or
@@ -24,12 +24,14 @@ class Newton(object):
         perform maxiter iterations, whichever happens first
 
         dx: step size for computing approximate Jacobian
-
+        
+        radius_max: will bind the root to a range around a specified maximum
         """
         self._f = f
         self._tol = tol
         self._maxiter = maxiter
         self._dx = dx
+        self.r = radius_max
 
     def solve(self, x0):
         """Determine a solution of f(x) = 0, using Newton's method, starting
@@ -48,7 +50,13 @@ class Newton(object):
             if np.linalg.norm(fx) < self._tol:
                 return x
             x = self.step(x, fx)
-
+        #Add maximum radius
+        if self.r is not None:
+            if abs(x - x0) <= self.r:
+                return x
+            else:
+                raise Exception("The solution is no longer within the maximum radius, try a new guess")
+                
         return x
 
     def step(self, x, fx=None):

@@ -33,7 +33,7 @@ class Newton(object):
         self._tol = tol
         self._maxiter = maxiter
         self._dx = dx
-        self.r = radius_max
+        self._r = radius_max
         
         
         #set analytical Jacobian if provided
@@ -79,17 +79,15 @@ class Newton(object):
             
         #If analytical Jacobian is provided, proceed this way:
         if self._given_analytical_jacobian:
-            Df_x = self.df(x)
-            h = np.linalg.solve(np.matrix(Df_x), np.matrix(fx))
-            if np.isscalar(x):
-                h = np.asscalar(h)
-            return x - h
+            Df_x = self._df(x)
+
         else:
         #if it is not provided:
             Df_x = F.approximateJacobian(self._f, x, self._dx)
         # linalg.solve(A,B) returns the matrix solution to AX = B, so
         # it gives (A^{-1}) B. np.matrix() promotes scalars to 1x1
         # matrices.
+        
         h = np.linalg.solve(np.matrix(Df_x), np.matrix(fx))
         # Suppose x was a scalar. At this point, h is a 1x1 matrix. If
         # we want to return a scalar value for our next guess, we need

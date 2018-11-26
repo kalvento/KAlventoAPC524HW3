@@ -93,11 +93,14 @@ class TestNewton(unittest.TestCase):
         f = lambda x : (x-5)**2
         Df = lambda x : 2*(x-5)
         solver = newton.Newton(f, tol=1.e-15, maxiter=30, Df=Df)
-        x = solver.solve(5.0)
-        self.assertAlmostEqual(x,1.0)
+        x = solver.solve(0)
+        self.assertAlmostEqual(x,5.0)
         return
         
 if __name__ == "__main__":
-    unittest.main()
-
+#    unittest.main()
+    suite = unittest.TestSuite() # make an empty TestSuite
+    suite.addTest(TestNewton("test_analytical_jacobian")) # add the test you want from a test class ( here TestNewton)
+    runner = unittest.TextTestRunner() # the runner is what orchestrates the test running
+    runner.run(suite)
     

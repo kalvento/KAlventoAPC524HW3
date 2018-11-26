@@ -59,12 +59,12 @@ class Newton(object):
             # linalg.norm works fine on scalar inputs
             if np.linalg.norm(fx) < self._tol and self._r is None:
                 x = self.checker(x)
-                print(x)
+                #print(x) for checking values on test
                 return x
             x = self.step(x, fx)
 
         #trying to fix no roots issue
-            print(x)
+            #print(x)
         raise Exception(" Uh oh, maxiter has been reached: maybe thre are no roots")
 
     

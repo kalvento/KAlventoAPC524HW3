@@ -38,6 +38,8 @@ class TestNewton(unittest.TestCase):
         4. If the derivative does not exist at the root
         5. The derivative is not a continuous function
     '''
+    #this test sets up a 2D funciton and tests the solver's ability to find
+    #its roots
     def test_2D(self):
         A = np.matrix("0.0 4.0; 1.0 0.0")
         k = lambda x : A*x
@@ -48,17 +50,23 @@ class TestNewton(unittest.TestCase):
         #need to develop a way to get second root that is opposite
         return
     
+    #This test sets up a more complicated 2D function and sees if the solver
+    #can find the roots. They are simplistic for the purposes of the test
     def test_2D_analytical_jacobian(self):
+        #lambda setup does not allow for this type of manipulation, so using the
+        #old school way of setting up the function like demonstrated above
         def k(x) :
             k = np.matrix("1.0 -4.0; 1.0 1.0")
             k[0,0] *= x[0]*x[0]
             k[0,1] *= x[1]
             k[1,0] *= x[0]*x[0]
             k[1,1] *= x[1]*x[1]
-            k1 = np.sum(k[0,:])
+            k1 = np.sum(k[0,:]) #need to sum the rows to get vector valued func.
             k2 = np.sum(k[1,:])
             k = np.matrix([[k1],[k2]])
             return k
+        #this sets up the derivative analytically instead of using the numerical
+        #solver
         def Dk(x):
             Dk = np.matrix("2.0 -4.0; 2.0 2.0")
             Dk[0,0] *= x[0]
@@ -69,7 +77,8 @@ class TestNewton(unittest.TestCase):
         x = solver.solve(np.matrix("1.0; 4.0"))
         np.testing.assert_almost_equal(x, np.matrix("0.0; 0.0"))
         return
-    
+    #this test will figure out if there are any roots of the function that is
+    #provided. If no real roots exist, it will raise an exception
     def test_there_are_no_roots(self):
         f = lambda x : x**2 + 13
         #f = lambda x : x*x + 1.0
@@ -79,6 +88,7 @@ class TestNewton(unittest.TestCase):
         self.assertRaises(Exception,solver.solve, -1)
         return
     
+    #this is testing the result of a poor initial guess and is fixed in newton
     def test_poor_initial_guess(self):
         import math
         f = lambda x : x*math.exp(x)
@@ -87,6 +97,7 @@ class TestNewton(unittest.TestCase):
         self.assertAlmostEqual(x, 0)
         return
     
+    #test for ensuring the guess is within the reasonable bound
     def test_radius_max(self):
         import math
         f = lambda x : x*math.exp(x)
@@ -94,6 +105,9 @@ class TestNewton(unittest.TestCase):
         self.assertRaises(Exception, solver.solve, -1)
         return   
     
+    #this tests the case of a horizontal slope at the first initial guess
+    # will require some form of movement of the initial guess to find at least
+    # one of the roots
     def test_zero_deriv(self):
         import math
         f = lambda x : -x**2 + 3
@@ -103,13 +117,14 @@ class TestNewton(unittest.TestCase):
         self.assertAlmostEqual(x, -math.sqrt(3))
         return
     
+    #similar to the no roots function test
     def test_divergent_function(self):
         f = lambda x : 1/(2+x)
         solver = newton.Newton(f, tol=1.e-15, maxiter=10)
         x = solver.solve(0)
         self.assertAlmostEqual(x,0)
         return
-    
+    #test for the analytical jacobian feature in 1D
     def test_analytical_jacobian(self):
         f = lambda x : (x-5)**2
         Df = lambda x : 2*(x-5)
@@ -119,9 +134,6 @@ class TestNewton(unittest.TestCase):
         return
         
 if __name__ == "__main__":
-#    unittest.main()
-    suite = unittest.TestSuite() # make an empty TestSuite
-    suite.addTest(TestNewton("test_2D_analytical_jacobian")) # add the test you want from a test class ( here TestNewton)
-    runner = unittest.TextTestRunner() # the runner is what orchestrates the test running
-    runner.run(suite)
+    unittest.main()
+
     

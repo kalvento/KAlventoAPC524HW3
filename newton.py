@@ -84,13 +84,12 @@ class Newton(object):
             if np.isscalar(x):
                 h = np.asscalar(h)
             return x - h
-        
+        else:
         #if it is not provided:
-        Df_x = F.approximateJacobian(self._f, x, self._dx)
+            Df_x = F.approximateJacobian(self._f, x, self._dx)
         # linalg.solve(A,B) returns the matrix solution to AX = B, so
         # it gives (A^{-1}) B. np.matrix() promotes scalars to 1x1
         # matrices.
-    else:
         h = np.linalg.solve(np.matrix(Df_x), np.matrix(fx))
         # Suppose x was a scalar. At this point, h is a 1x1 matrix. If
         # we want to return a scalar value for our next guess, we need

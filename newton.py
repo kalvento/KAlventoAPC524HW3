@@ -62,7 +62,9 @@ class Newton(object):
                 print(x)
                 return x
             x = self.step(x, fx)
+
         #trying to fix no roots issue
+            print(x)
         raise Exception(" Uh oh, maxiter has been reached: maybe thre are no roots")
 
     

@@ -38,6 +38,38 @@ class TestNewton(unittest.TestCase):
         4. If the derivative does not exist at the root
         5. The derivative is not a continuous function
     '''
+    def test_2D(self):
+        A = np.matrix("0.0 4.0; 1.0 0.0")
+        k = lambda x : A*x
+        solver = newton.Newton(k, tol=1.e-15, maxiter=10)
+        x = solver.solve(np.matrix("3.0; 15.0"))
+        np.testing.assert_almost_equal(x, np.matrix("0.0; 0.0"))
+        #so this finds one of the roots, but how do we find the other? 
+        #need to develop a way to get second root that is opposite
+        return
+    
+    def test_2D_analytical_jacobian(self):
+        def k(x) :
+            k = np.matrix("1.0 -4.0; 1.0 1.0")
+            k[0,0] *= x[0]*x[0]
+            k[0,1] *= x[1]
+            k[1,0] *= x[0]*x[0]
+            k[1,1] *= x[1]*x[1]
+            k1 = np.sum(k[0,:])
+            k2 = np.sum(k[1,:])
+            k = np.matrix([[k1],[k2]])
+            return k
+        def Dk(x):
+            Dk = np.matrix("2.0 -4.0; 2.0 2.0")
+            Dk[0,0] *= x[0]
+            Dk[1,0] *= x[0]
+            Dk[1,1] *= x[1]
+            return Dk
+        solver = newton.Newton(k, tol=1.e-15, maxiter=1000, Df=Dk)
+        x = solver.solve(np.matrix("1.0; 4.0"))
+        np.testing.assert_almost_equal(x, np.matrix("0.0; 0.0"))
+        return
+    
     def test_there_are_no_roots(self):
         f = lambda x : x**2 + 13
         #f = lambda x : x*x + 1.0
@@ -60,16 +92,7 @@ class TestNewton(unittest.TestCase):
         f = lambda x : x*math.exp(x)
         solver = newton.Newton(f, tol=1.e-15, maxiter=30, radius_max=0.3)
         self.assertRaises(Exception, solver.solve, -1)
-        return
-    
-    def test_higher_order(self):
-        f = lambda x : x*x - 1
-        solver = newton.Newton(f, tol=1.e-15, maxiter=10)
-        x = solver.solve(-0.01)
-        self.assertAlmostEqual(x, 1.0)
-        #so this finds one of the roots, but how do we find the other? 
-        #need to develop a way to get second root that is opposite
-        return
+        return   
     
     def test_zero_deriv(self):
         import math
@@ -96,9 +119,9 @@ class TestNewton(unittest.TestCase):
         return
         
 if __name__ == "__main__":
-    unittest.main()
+#    unittest.main()
     suite = unittest.TestSuite() # make an empty TestSuite
-    suite.addTest(TestNewton("test_zero_deriv")) # add the test you want from a test class ( here TestNewton)
+    suite.addTest(TestNewton("test_2D_analytical_jacobian")) # add the test you want from a test class ( here TestNewton)
     runner = unittest.TextTestRunner() # the runner is what orchestrates the test running
-#    runner.run(suite)
+    runner.run(suite)
     

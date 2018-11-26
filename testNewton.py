@@ -88,6 +88,14 @@ class TestNewton(unittest.TestCase):
         x = solver.solve(0)
         self.assertAlmostEqual(x,0)
         return
+    
+    def test_analytical_jacobian(self):
+        f = lambda x : (x-5)**2
+        Df = lambda x : 2*(x-5)
+        solver = newton.Newton(f, tol=1.e-15, maxiter=30, Df=Df)
+        x = solver.solve(5.0)
+        self.assertAlmostEqual(x,1.0)
+        return
         
 if __name__ == "__main__":
     unittest.main()

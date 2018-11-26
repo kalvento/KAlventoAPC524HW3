@@ -13,7 +13,7 @@ class Newton(object):
 
     """
     
-    def __init__(self, f, tol=1.e-6, maxiter=20, dx=1.e-6, radius_max=None):
+    def __init__(self, f, tol=1.e-6, maxiter=20, dx=1.e-6, radius_max=None, Df=None):
         """Parameters:
         
         f: the function whose roots we seek. Can be scalar- or
@@ -26,12 +26,22 @@ class Newton(object):
         dx: step size for computing approximate Jacobian
         
         radius_max: will bind the root to a range around a specified maximum
+        
+        Df: analytical jacobian to assist in root finding
         """
         self._f = f
         self._tol = tol
         self._maxiter = maxiter
         self._dx = dx
         self.r = radius_max
+        
+        
+        #set analytical Jacobian if provided
+        self._given_analytical_jacobian = False
+        if Df is not None:
+            self._df = Df
+            self._given_analytical_jacobian = True
+            
 
     def solve(self, x0):
         """Determine a solution of f(x) = 0, using Newton's method, starting
@@ -47,7 +57,7 @@ class Newton(object):
         for i in range(self._maxiter):
             fx = self._f(x)
             # linalg.norm works fine on scalar inputs
-            if np.linalg.norm(fx) < self._tol:
+            if np.linalg.norm(fx) < self._tol and self._r is None:
                 return x
             x = self.step(x, fx)
         #Add maximum radius
@@ -66,11 +76,21 @@ class Newton(object):
         """
         if fx is None:
             fx = self._f(x)
-
+            
+        #If analytical Jacobian is provided, proceed this way:
+        if self._given_analytical_jacobian:
+            Df_x = self.df(x)
+            h = np.linalg.solve(np.matrix(Df_x), np.matrix(fx))
+            if np.isscalar(x):
+                h = np.asscalar(h)
+            return x - h
+        
+        #if it is not provided:
         Df_x = F.approximateJacobian(self._f, x, self._dx)
         # linalg.solve(A,B) returns the matrix solution to AX = B, so
         # it gives (A^{-1}) B. np.matrix() promotes scalars to 1x1
         # matrices.
+    else:
         h = np.linalg.solve(np.matrix(Df_x), np.matrix(fx))
         # Suppose x was a scalar. At this point, h is a 1x1 matrix. If
         # we want to return a scalar value for our next guess, we need

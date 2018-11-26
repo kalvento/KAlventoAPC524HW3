@@ -50,11 +50,8 @@ class TestNewton(unittest.TestCase):
     def test_poor_initial_guess(self):
         import math
         f = lambda x : x*math.exp(x)
-        #if maxiter is 20 here, the value given back is not the root, it is
-        #just the value that the solver ended up on
-        #when maxiter is 2000, gives 6.06
-        solver = newton.Newton(f, tol=1.e-15, maxiter=30)
-        x = solver.solve(1)
+        solver = newton.Newton(f, tol=1.e-15, maxiter=3000)
+        x = solver.solve(-50)
         self.assertAlmostEqual(x, 0)
         return
     
@@ -74,11 +71,13 @@ class TestNewton(unittest.TestCase):
         #need to develop a way to get second root that is opposite
         return
     
-    def test_no_deriv_root(self):
-        f = lambda x : x*x
-        solver = newton.Newton(f, tol=1.e-15, maxiter = 10)
-        x = solver.solve(3)
-        self.assertAlmostEqual(x, 0)
+    def test_zero_deriv(self):
+        import math
+        f = lambda x : -x**2 + 3
+        Df = lambda x : -2*x
+        solver = newton.Newton(f, tol=1.e-15, maxiter = 30, Df=Df)
+        x = solver.solve(0)
+        self.assertAlmostEqual(x, -math.sqrt(3))
         return
     
     def test_divergent_function(self):
@@ -97,9 +96,9 @@ class TestNewton(unittest.TestCase):
         return
         
 if __name__ == "__main__":
-#    unittest.main()
+    unittest.main()
     suite = unittest.TestSuite() # make an empty TestSuite
-    suite.addTest(TestNewton("test_there_are_no_roots")) # add the test you want from a test class ( here TestNewton)
+    suite.addTest(TestNewton("test_zero_deriv")) # add the test you want from a test class ( here TestNewton)
     runner = unittest.TextTestRunner() # the runner is what orchestrates the test running
-    runner.run(suite)
+#    runner.run(suite)
     

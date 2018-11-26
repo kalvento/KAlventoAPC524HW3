@@ -59,6 +59,7 @@ class Newton(object):
             # linalg.norm works fine on scalar inputs
             if np.linalg.norm(fx) < self._tol and self._r is None:
                 x = self.checker(x)
+                print(x)
                 return x
             x = self.step(x, fx)
         #trying to fix no roots issue
@@ -83,8 +84,12 @@ class Newton(object):
         # linalg.solve(A,B) returns the matrix solution to AX = B, so
         # it gives (A^{-1}) B. np.matrix() promotes scalars to 1x1
         # matrices.
-        
+        if np.linalg.norm(Df_x) == 0:
+            print("Adjusting Jacobian for singular derivative")
+            Df_x += self._dx
+                           
         h = np.linalg.solve(np.matrix(Df_x), np.matrix(fx))
+    
         # Suppose x was a scalar. At this point, h is a 1x1 matrix. If
         # we want to return a scalar value for our next guess, we need
         # to re-scalarize h before combining it with our previous

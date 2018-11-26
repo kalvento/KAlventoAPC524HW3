@@ -39,13 +39,12 @@ class TestNewton(unittest.TestCase):
         5. The derivative is not a continuous function
     '''
     def test_there_are_no_roots(self):
-        f = lambda x : 0*x + 13.5
+        f = lambda x : x**2 + 13
         #f = lambda x : x*x + 1.0
         solver = newton.Newton(f, tol=1.e-15, maxiter=10)
-        x = solver.solve(-1)
         #it should be exactly equal if the root is provided
         #i = np.sqrt(-1)
-        self.assertEqual(x,-13.5)
+        self.assertRaises(Exception,solver.solve, -1)
         return
     
     def test_poor_initial_guess(self):
@@ -100,7 +99,7 @@ class TestNewton(unittest.TestCase):
 if __name__ == "__main__":
 #    unittest.main()
     suite = unittest.TestSuite() # make an empty TestSuite
-    suite.addTest(TestNewton("test_analytical_jacobian")) # add the test you want from a test class ( here TestNewton)
+    suite.addTest(TestNewton("test_there_are_no_roots")) # add the test you want from a test class ( here TestNewton)
     runner = unittest.TextTestRunner() # the runner is what orchestrates the test running
     runner.run(suite)
     

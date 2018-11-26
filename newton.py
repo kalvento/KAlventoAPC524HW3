@@ -58,17 +58,13 @@ class Newton(object):
             fx = self._f(x)
             # linalg.norm works fine on scalar inputs
             if np.linalg.norm(fx) < self._tol and self._r is None:
+                x = self.checker(x)
                 return x
             x = self.step(x, fx)
-        #Add maximum radius
-        if self.r is not None:
-            if abs(x - x0) <= self.r:
-                return x
-            else:
-                raise Exception("The solution is no longer within the maximum radius, try a new guess")
-                
-        return x
+        #trying to fix no roots issue
+        raise Exception(" Uh oh, maxiter has been reached: maybe thre are no roots")
 
+    
     def step(self, x, fx=None):
         """Take a single step of a Newton method, starting from x. If the
         argument fx is provided, assumes fx = f(x).
@@ -99,3 +95,14 @@ class Newton(object):
             h = np.asscalar(h)
 
         return x - h #this needs to be a subtraction, not addition to satisfy the Newton method
+
+    def checker(self, x):
+         #check maximum radius
+        if self._r is not None:
+            if abs(x - x0) <= self._r:
+                return x
+            else:
+                raise Exception("The solution is no longer within the maximum radius, try a new guess")
+        else:
+            return x
+        
